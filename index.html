@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Watch</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Import Orbitron font from Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+</head>
+<style>
+    /* General styles */
+body {
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    background-color: #222;
+}
+
+h1 {
+    text-align: center;
+    color: #fff;
+}
+
+#clock {
+    text-align: center;
+    font-size: 6cm;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Collapsible menu styles */
+.collapsible {
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    text-align: center;
+    font-size: 18px;
+}
+
+.collapsible:active, .collapsible:hover {
+    background-color: #444;
+}
+
+.content {
+    padding: 10px;
+    display: none;
+    background-color: #444;
+    text-align: center;
+}
+
+/* When collapsible section is active, show the content */
+.collapsible:focus + .content, .content.show {
+    display: block;
+}
+
+/* Media Query for Phone Screen */
+@media screen and (max-width: 600px) {
+    #daysContainer {
+        width: 100%;
+    }
+    #clock {
+        font-size: 2em;
+        margin-top: 20px;
+    }
+    #openAlarmBtn, #openTimerBtn, #openStopwatchBtn {
+        display: block;
+        width: 100%;
+        margin-top: 10px;
+    }
+    #currentDate {
+        font-size: 16px;
+    }
+    .apps-grid-scrollable {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .app-item {
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    #time, #sec {
+        font-size: 3em;
+    }
+}
+
+</style>
+<body>
+    <div>
+        <h1>Digital Watch, Alarm, Timer, and Stopwatch</h1>
+
+       <!-- Days of the Week on the left -->
+<div id="daysContainer" class="collapsible-container">
+    <button class="collapsible">Days of the Week</button>
+    <div class="content">
+        <div class="day" id="sunday">Sunday</div>
+        <div class="day" id="monday">Monday</div>
+        <div class="day" id="tuesday">Tuesday</div>
+        <div class="day" id="wednesday">Wednesday</div>
+        <div class="day" id="thursday">Thursday</div>
+        <div class="day" id="friday">Friday</div>
+        <div class="day" id="saturday">Saturday</div>
+    </div>
+</div>
+
+
+        <!-- Clock -->
+        <div id="clock">
+            <div id="time">00</div>:<div id="sec">00</div> <span id="mid"></span>
+        </div>
+
+        <!-- Add Apps Button -->
+
+
+<!-- Apps Modal -->
+<div id="appsModal" class="modal">
+    <div class="modal-content">
+        <h2>Available Apps</h2>
+        <div class="apps-grid-scrollable">
+            <!-- Theme App -->
+            <div class="app-item">
+                <img src="icons/Theme-icon.png" alt="Theme App" class="app-icon" id="themeApp">
+                <p>Theme App</p>
+            </div>
+            <!-- Weather App -->
+            <div class="app-item">
+                <img src="icons/weather-icon.png" alt="Weather App" class="app-icon" id="weatherApp">
+                <p>Weather App</p>
+            </div>
+            <!-- Note-Taking App -->
+            <div class="app-item">
+                <img src="icons/Note-icon.png" alt="Note App" class="app-icon" id="noteApp">
+                <p>Note App</p>
+            </div>
+            <!-- Additional Apps -->
+            <div class="app-item">
+                <img src="icons/Snake-icon.png" alt="Snake Game" class="app-icon" id="snakeGameApp">
+                <p>Snake Game</p>
+            </div>
+        </div>
+        <button class="closeBtn" data-modal="appsModal">Close</button>
+    </div>
+</div>
+
+
+
+
+        <!-- Buttons for features below the clock -->
+        <div style="margin-top: 30px;"> <!-- Added margin to create space -->
+            <button id="openAlarmBtn">Set Alarm</button>
+            <button id="openTimerBtn">Set Timer</button>
+            <button id="openStopwatchBtn">Stopwatch</button>
+        </div><br>
+        <div style="margin-top: 20px;">
+            <button id="openAppsBtn">Open Apps</button>
+        </div><br><br>
+        <!-- Display Date Below the Buttons -->
+        <div id="currentDate" style="margin-top: 20px; font-size: 18px; color: #fff; text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;"></div>
+
+        <!-- Alarm Modal -->
+        <div id="alarmModal" class="modal">
+            <div class="modal-content">
+                <h2>Set Alarm</h2>
+                <label for="alarmTime">Alarm Time:</label>
+                <input type="time" id="alarmTime">
+                <label for="alarmRingtone">Ringtone:</label>
+                <select id="alarmRingtone">
+                    <option value="ringtone1">Ringtone 1</option>
+                    <option value="ringtone2">Ringtone 2</option>
+                    <option value="ringtone3">Ringtone 3</option>
+                </select>
+                <br><br>
+                <button id="setAlarmBtn">Set Alarm</button>
+                <button class="closeBtn" data-modal="alarmModal">Close</button>
+            </div>
+        </div>
+
+        <!-- Ringing Alarm Modal -->
+        <div id="ringingModal" class="modal">
+            <div class="modal-content">
+                <h2>Alarm Ringing!</h2>
+                <button id="stopAlarmBtn">Stop</button>
+                <button id="snoozeAlarmBtn">Snooze</button>
+            </div>
+        </div>
+
+        <!-- Timer Modal -->
+        <div id="timerModal" class="modal">
+            <div class="modal-content">
+                <h2>Set Timer</h2>
+                <label for="timerMinutes">Minutes:</label>
+                <input type="number" id="timerMinutes" min="0">
+                <label for="timerSeconds">Seconds:</label>
+                <input type="number" id="timerSeconds" min="0" max="59">
+                <br><br>
+                <button id="startTimerBtn">Start Timer</button>
+                <button class="closeBtn" data-modal="timerModal">Close</button>
+                <div id="timerStatus"></div>
+            </div>
+        </div>
+
+        <!-- Stopwatch Modal -->
+        <div id="stopwatchModal" class="modal">
+            <div class="modal-content">
+                <h2>Stopwatch</h2>
+                <div id="stopwatchDisplay">00:00:00</div>
+                <button id="startStopwatchBtn">Start</button>
+                <button id="stopStopwatchBtn">Stop</button>
+                <button id="resetStopwatchBtn">Reset</button>
+                <button class="closeBtn" data-modal="stopwatchModal">Close</button>
+            </div>
+        </div>
+
+        <!-- Theme Modal -->
+        <div id="themeModal" class="modal">
+            <div class="modal-content">
+                <h2>Choose an Image as Theme</h2>
+                <input type="file" id="themeImageInput" accept="image/*">
+                <br><br>
+                <button id="setThemeBtn">Set Theme</button>
+                <button class="closeBtn" data-modal="themeModal">Close</button>
+             </div>
+        </div>
+        
+        
+        <!-- Weather Modal -->
+<div id="weatherModal" class="modal">
+    <div class="modal-content">
+        <h2>Weather Forecast</h2>
+        <div id="weatherLocation" style="font-size: 18px; margin-bottom: 10px;"></div>
+        <div id="currentWeather" style="display: flex; align-items: center; margin-bottom: 20px;">
+            <img id="weatherIcon" src="" alt="Weather Icon" style="width: 50px; height: 50px; margin-right: 10px;">
+            <span id="weatherDescription"></span>
+            <span id="weatherTemp" style="margin-left: 10px; font-size: 24px;"></span>
+        </div>
+        <div id="forecast">
+            <div>
+                <img src="https://openweathermap.org/img/wn/01d.png" alt="Weather Icon">
+                <div>12:00 PM</div>
+                <div>25°C</div>
+            </div>
+            <div>
+                <img src="https://openweathermap.org/img/wn/02d.png" alt="Weather Icon">
+                <div>3:00 PM</div>
+                <div>28°C</div>
+            </div>
+            <div>
+                <img src="https://openweathermap.org/img/wn/03d.png" alt="Weather Icon">
+                <div>6:00 PM</div>
+                <div>23°C</div>
+            </div>
+            <div>
+                <img src="https://openweathermap.org/img/wn/04d.png" alt="Weather Icon">
+                <div>9:00 PM</div>
+                <div>20°C</div>
+            </div>
+            <div>
+                <img src="https://openweathermap.org/img/wn/10d.png" alt="Weather Icon">
+                <div>12:00 AM</div>
+                <div>18°C</div>
+            </div>
+        </div>
+        
+        <button class="closeBtn" data-modal="weatherModal">Close</button>
+    </div>
+
+    <div id="weatherSearch" style="margin-bottom: 20px;">
+        <input type="text" id="weatherCity" placeholder="Enter city name" style="padding: 10px; width: 80%; max-width: 300px; border-radius: 5px;">
+        <button id="fetchWeatherBtn" style="padding: 10px;">Search</button>
+    </div>
+    
+    
+</div>
+    <!-- Note Taking Modal -->
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <h2>Note Taking</h2>
+        <textarea id="noteText" rows="5" cols="40" placeholder="Write your note here..." style="padding: 10px; font-size: 16px;"></textarea>
+        <br><br>
+        <button id="saveNoteBtn">Save Note</button>
+        <button class="closeBtn" data-modal="noteModal">Close</button>
+        <div id="savedNotes" style="margin-top: 20px; font-size: 16px; color: #fff;"></div>
+    </div>
+</div>
+    </div>
+    
+    <script>
+        function updateDayHighlight() {
+            const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            const currentDay = new Date().getDay(); // Get the current day (0 = Sunday, 6 = Saturday)
+
+            // Remove the glowing effect from all days
+            days.forEach(day => document.getElementById(day).classList.remove("glowing"));
+
+            // Add the glowing effect to the current day
+            const currentDayElement = document.getElementById(days[currentDay]);
+            currentDayElement.classList.add("glowing");
+        }
+
+        // Update the highlight every time the page loads
+        updateDayHighlight();
+
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDate = new Date().toLocaleDateString('en-US', options); // Format the date
+            document.getElementById("currentDate").textContent = currentDate; // Display the date
+        }
+
+        // Update the date when the page loads
+        updateDate();
+
+    
+    // Get the Apps button and modal
+    const openAppsBtn = document.getElementById("openAppsBtn");
+    const appsModal = document.getElementById("appsModal");
+    const closeAppsBtns = document.querySelectorAll(".closeBtn");
+
+    // Event listener to open the Apps modal
+    openAppsBtn.addEventListener("click", () => {
+        appsModal.style.display = "block";
+    });
+
+    // Event listeners to close modals
+    closeAppsBtns.forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            const modalId = e.target.getAttribute("data-modal");
+            document.getElementById(modalId).style.display = "none";
+        });
+    });
+
+   // Example functionality for Theme App
+document.getElementById("themeApp").addEventListener("click", () => {
+    themeModal.style.display = "block"; // Open the Theme modal
+});
+
+document.getElementById("weatherApp").addEventListener("click", () => {
+    const weatherModal = document.getElementById("weatherModal");
+    weatherModal.style.display = "block"; // Open the weather modal
+    getWeatherData("Mombasa"); // Replace "New York" with a default city or user input
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener("click", (e) => {
+    if (e.target === document.getElementById("weatherModal")) {
+        document.getElementById("weatherModal").style.display = "none";
+    }
+});
+
+// Event listener for search button
+document.getElementById("fetchWeatherBtn").addEventListener("click", () => {
+    const city = document.getElementById("weatherCity").value.trim();
+    if (city) {
+        getWeatherData(city);
+    } else {
+        alert("Please enter a valid city name.");
+    }
+});
+
+// Updated getWeatherData Function with Error Message Display
+async function getWeatherData(city) {
+    const apiKey = "2aeef4a937ab9b6abdce8778acf594d2"; // Replace with your actual API key
+    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("City not found");
+        const data = await response.json();
+
+        // Update weather details on success
+        document.getElementById("weatherLocation").textContent = `${data.city.name}, ${data.city.country}`;
+        const currentWeather = data.list[0];
+        document.getElementById("weatherIcon").src = `https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}.png`;
+        document.getElementById("weatherDescription").textContent = currentWeather.weather[0].description;
+        document.getElementById("weatherTemp").textContent = `${Math.round(currentWeather.main.temp)}°C`;
+
+        // Update forecast
+        const forecastContainer = document.getElementById("forecast");
+        forecastContainer.innerHTML = ""; // Clear previous forecast
+        for (let i = 0; i < 5; i++) {
+            const forecast = data.list[i];
+            const forecastElement = document.createElement("div");
+            forecastElement.style.textAlign = "center";
+            forecastElement.innerHTML = `
+                <img src="https://openweathermap.org/img/wn/${forecast.weather[0].icon}.png" alt="Weather Icon">
+                <div>${new Date(forecast.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                <div>${Math.round(forecast.main.temp)}°C</div>
+            `;
+            forecastContainer.appendChild(forecastElement);
+        }
+    } catch (error) {
+        document.getElementById("weatherLocation").textContent = "Error fetching weather data.";
+        console.error("Error:", error.message);
+    }
+}
+
+
+    // Close the modal when clicking outside of it
+    window.addEventListener("click", (e) => {
+        if (e.target === appsModal) {
+            appsModal.style.display = "none";
+        }
+    });
+    
+
+    // Get Theme Modal and its elements
+const themeModal = document.getElementById("themeModal");
+const themeApp = document.getElementById("themeApp");
+const setThemeBtn = document.getElementById("setThemeBtn");
+const themeImageInput = document.getElementById("themeImageInput");
+
+// Open the Theme modal when the Theme App icon is clicked
+themeApp.addEventListener("click", () => {
+    themeModal.style.display = "block";
+});
+
+// Close the Theme modal when the Set Theme button is clicked
+setThemeBtn.addEventListener("click", () => {
+    const file = themeImageInput.files[0]; // Get the selected file
+
+    if (file) {
+        const reader = new FileReader(); // Create a FileReader to read the image file
+        reader.onload = (e) => {
+            // Set the background image of the body to the uploaded image
+            document.body.style.backgroundImage = `url(${e.target.result})`;
+            document.body.style.backgroundSize = "cover"; // Make the image cover the entire body
+            document.body.style.backgroundPosition = "center"; // Center the image
+            document.body.style.backgroundAttachment = "fixed"; // Make the background fixed
+        };
+        reader.readAsDataURL(file); // Read the file as a data URL
+    }
+
+    themeModal.style.display = "none"; // Close the modal
+});
+
+// Close the modal when clicking outside of it
+window.addEventListener("click", (e) => {
+    if (e.target === themeModal) {
+        themeModal.style.display = "none";
+    }
+});
+
+// Event listener for opening the Note Taking App
+document.getElementById("noteApp").addEventListener("click", () => {
+    document.getElementById("noteModal").style.display = "block"; // Open the Note Taking modal
+});
+
+// Save the note when the button is clicked
+document.getElementById("saveNoteBtn").addEventListener("click", () => {
+    const note = document.getElementById("noteText").value.trim();
+    if (note) {
+        saveNoteToLocalStorage(note);
+    } else {
+        alert("Please write something before saving!");
+    }
+});
+
+// Function to save the note in localStorage
+function saveNoteToLocalStorage(note) {
+    let notes = JSON.parse(localStorage.getItem("notes")) || [];
+    notes.push(note);
+    localStorage.setItem("notes", JSON.stringify(notes));
+
+    displaySavedNotes();
+    document.getElementById("noteText").value = ""; // Clear the text area after saving
+}
+
+// Function to display saved notes
+function displaySavedNotes() {
+    const savedNotesContainer = document.getElementById("savedNotes");
+    const notes = JSON.parse(localStorage.getItem("notes")) || [];
+    savedNotesContainer.innerHTML = ""; // Clear the previous notes
+
+    notes.forEach((note, index) => {
+        const noteElement = document.createElement("div");
+        noteElement.textContent = `${index + 1}. ${note}`;
+        savedNotesContainer.appendChild(noteElement);
+    });
+}
+
+// Display saved notes when the page loads
+window.onload = displaySavedNotes;
+
+// Add functionality to open the Snake Game
+document.getElementById("snakeGameApp").addEventListener("click", function() {
+    window.location.href = "snake.html"; // Navigate to the Snake Game
+});
+
+// Get all collapsible buttons
+const collapsible = document.getElementsByClassName("collapsible");
+
+// Add event listeners to each collapsible button
+for (let i = 0; i < collapsible.length; i++) {
+    collapsible[i].addEventListener("click", function() {
+        // Toggle the "active" class to change the button's style
+        this.classList.toggle("active");
+        
+        // Toggle the content's visibility
+        const content = this.nextElementSibling;
+        if (content.style.display === "block") {
+            content.style.display = "none";
+        } else {
+            content.style.display = "block";
+        }
+    });
+}
+
+ // Highlight the current day
+ function updateDayHighlight() {
+            const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+            const currentDay = new Date().getDay(); // Get the current day (0 = Sunday, 6 = Saturday)
+
+            // Remove the glowing effect from all days
+            days.forEach(day => document.getElementById(day).classList.remove("glowing"));
+
+            // Add the glowing effect to the current day
+            const currentDayElement = document.getElementById(days[currentDay]);
+            currentDayElement.classList.add("glowing");
+        }
+
+        // Update the highlight every time the page loads
+        updateDayHighlight();
+        
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>
